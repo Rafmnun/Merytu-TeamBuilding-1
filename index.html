@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plano do Dia — Merytu Team Building</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f7f5f2;
+    color: #1a1a1a;
+    padding: 24px 16px 48px;
+  }
+  .header { max-width: 860px; margin: 0 auto 24px; }
+  .header h1 { font-size: 1.45rem; font-weight: 800; color: #2d1b69; }
+  .header p { font-size: 0.85rem; color: #666; margin-top: 4px; }
+
+  .toolbar {
+    max-width: 860px;
+    margin: 0 auto 18px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .toolbar button {
+    padding: 7px 14px; border-radius: 7px;
+    border: 1.5px solid #ccc; background: white;
+    color: #2d1b69; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer;
+  }
+  .toolbar button.primary { background: #2d1b69; color: white; border-color: #2d1b69; }
+  .toolbar button:hover { opacity: 0.85; }
+
+  .section-label {
+    max-width: 860px; margin: 18px auto 6px;
+    font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.09em;
+    color: #2d1b69; opacity: 0.65;
+  }
+
+  .plan { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+
+  .block {
+    background: white; border-radius: 11px;
+    border: 1.5px solid #e8e4f5;
+  }
+  .block-header {
+    display: flex; align-items: stretch; cursor: pointer;
+  }
+  .phase-tag { width: 6px; flex-shrink: 0; border-radius: 11px 0 0 11px; }
+  .ph-manha      { background: #f59e0b; }
+  .ph-almoco     { background: #10b981; }
+  .ph-transicao  { background: #94a3b8; }
+  .ph-tarde      { background: #3b82f6; }
+  .ph-encerramento { background: #8b5cf6; }
+
+  .block-main { flex: 1; padding: 13px 14px; display: flex; gap: 14px; align-items: flex-start; }
+  .time-col { flex-shrink: 0; width: 100px; }
+  .time-start { font-size: 1.05rem; font-weight: 800; color: #2d1b69; }
+  .time-dur { font-size: 0.74rem; color: #999; margin-top: 2px; }
+  .content-col { flex: 1; }
+  .moment-title { font-size: 0.93rem; font-weight: 700; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .moment-sub { font-size: 0.8rem; color: #555; margin-top: 3px; line-height: 1.4; }
+  .expand-btn { flex-shrink: 0; padding: 0 14px; display: flex; align-items: center; color: #bbb; font-size: 0.85rem; }
+
+  .badge {
+    display: inline-block; font-size: 0.72rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .badge-confirmado { background: #d1fae5; color: #065f46; }
+  .badge-pendente   { background: #fef3c7; color: #92400e; }
+  .badge-adefinir   { background: #f1f5f9; color: #475569; }
+
+  .block-detail {
+    display: none; padding: 12px 16px 16px 122px;
+    border-top: 1px solid #f0eeff;
+  }
+  .block-detail.open { display: block; }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  @media (max-width: 560px) { .detail-grid { grid-template-columns: 1fr; } .block-detail { padding-left: 16px; } }
+  .detail-field label { display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #999; margin-bottom: 4px; }
+  .detail-field.full { grid-column: 1 / -1; }
+  .editable {
+    width: 100%; border: 1.5px solid #e0daf5; border-radius: 6px;
+    padding: 7px 10px; font-size: 0.83rem; color: #1a1a1a;
+    background: #faf9ff; font-family: inherit; resize: vertical;
+    line-height: 1.45; transition: border-color 0.15s;
+  }
+  .editable:focus { outline: none; border-color: #2d1b69; background: white; }
+  input.editable { min-height: auto; resize: none; height: 36px; }
+
+  /* Checklist */
+  .checklist-section { max-width: 860px; margin: 28px auto 0; background: white; border-radius: 12px; border: 1.5px solid #e8e4f5; padding: 20px 22px; }
+  .checklist-section h2 { font-size: 1rem; font-weight: 700; color: #2d1b69; margin-bottom: 14px; }
+  .checklist-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+  @media (max-width: 560px) { .checklist-cols { grid-template-columns: 1fr; } }
+  .check-group h3 { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 8px; }
+  .check-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+  .check-item input[type=checkbox] { margin-top: 3px; accent-color: #2d1b69; width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+  .check-item span { font-size: 0.83rem; color: #333; line-height: 1.4; }
+  .check-item span.done { text-decoration: line-through; color: #bbb; }
+  .add-item-row { display: flex; gap: 6px; margin-top: 10px; }
+  .add-item-row input { flex: 1; border: 1.5px solid #e0daf5; border-radius: 6px; padding: 6px 10px; font-size: 0.82rem; font-family: inherit; background: #faf9ff; }
+  .add-item-row input:focus { outline: none; border-color: #2d1b69; }
+  .add-item-row button { padding: 6px 12px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 0.82rem; cursor: pointer; }
+
+  .hint { max-width: 860px; margin: 12px auto 0; font-size: 0.77rem; color: #aaa; text-align: right; }
+
+  @media print {
+    body { background: white; padding: 10px; }
+    .toolbar { display: none; }
+    .block-detail { display: block !important; }
+    .expand-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 Plano do Dia — Merytu Team Building</h1>
+  <p>Terça-feira, 30 de junho de 2026 &nbsp;·&nbsp; ~20 participantes &nbsp;·&nbsp; Parque Florestal de Monsanto + Rio Tejo</p>
+</div>
+
+<div class="toolbar">
+  <button onclick="expandAll()">Expandir tudo</button>
+  <button onclick="collapseAll()">Recolher tudo</button>
+  <button class="primary" onclick="window.print()">🖨️ Imprimir / PDF</button>
+</div>
+
+<div id="plan" class="plan"></div>
+
+<div class="checklist-section">
+  <h2>🎒 O que pedir à equipa para trazer</h2>
+  <div class="checklist-cols" id="checklist"></div>
+</div>
+
+<p class="hint">Todos os campos são editáveis diretamente. Usa "Imprimir / PDF" para guardar uma versão.</p>
+
+<script>
+const BLOCKS = [
+  {
+    phase: "manha", time: "09h00", dur: "30 min", emoji: "🚗",
+    title: "Chegada e concentração",
+    sub: "Skatepark / Parque Radical da Serafina, Monsanto",
+    status: "adefinir",
+    local: "Parque Radical da Serafina — entrada pela Estrada da Barcalhoa. Estacionamento disponível.",
+    logistica: "Receber os participantes na entrada. Distribuir materiais de orientação (mapa, envelope inicial). Verificar presenças.",
+    notas: "Momento informal e energizante. Apresentar o programa do dia de forma breve. Não alongar — o grupo quer começar.",
+    resp: "Rafael + co-facilitador"
+  },
+  {
+    phase: "manha", time: "09h30", dur: "~2h30", emoji: "🧭",
+    title: "Missão Merytu — Prova de Orientação",
+    sub: "7 postos de controlo · rota ~2.2 km · zona de ~800m de raio",
+    status: "confirmado",
+    local: "Parque Florestal de Monsanto — zona da Serafina. Compact route entre Skatepark e Moinho do Penedo.",
+    logistica: "Equipas de ~5 pessoas. Materiais: mapas impressos, pistas em envelopes selados por posto, fichas de registo, carimbos/autocolantes. Lanche de meio-percurso no Posto 4.",
+    notas: "Cada posto tem desafio físico + desafio relacional. Rotatividade de liderança por posto (quem lidera num posto não pode no seguinte). Ter telemóvel para coordenação entre facilitadores no campo.",
+    resp: "Rafael (facilita / briefing) + co-facilitador (logística de campo)"
+  },
+  {
+    phase: "manha", time: "11h30", dur: "~30 min", emoji: "🏁",
+    title: "Chegada ao ponto final + debriefing rápido",
+    sub: "Zona do Parque de Merendas do Moinho do Penedo",
+    status: "adefinir",
+    local: "Parque de Merendas do Moinho do Penedo (WC no local, água disponível, vistas para o Tejo).",
+    logistica: "Reagrupar todas as equipas. Partilha breve de momentos da prova. Anunciar resultados / vencedores simbólicos se houver pontuação.",
+    notas: "Manter curto — o grupo vai estar com fome. Valorizar participação, não só resultados. Deixar espaço para risada e celebração espontânea.",
+    resp: "Rafael"
+  },
+  {
+    phase: "almoco", time: "12h00", dur: "~1h15", emoji: "🍕",
+    title: "Almoço",
+    sub: "Parque de Merendas do Moinho do Penedo — pizza da Pizzaria Luzzo",
+    status: "pendente",
+    local: "Parque de Merendas do Moinho do Penedo, Monsanto. Estacionamento, WC, mesas de picnic, vistas para o Tejo.",
+    logistica: "~7–8 pizzas encomendadas à Pizzaria Luzzo (Algés, tel. 21 195 6954). Amigo recolhe e transporta em sacos térmicos. Trazer: pratos descartáveis, copos, guardanapos, sacos de lixo, bebidas frescas (águas, sumos).",
+    notas: "Encomendar pizza para as 11h45 (chegar a tempo). Confirmar encomenda na véspera. Quem faz o transporte da pizza? → A definir.",
+    resp: "A definir (transporte da pizza)"
+  },
+  {
+    phase: "transicao", time: "13h15", dur: "~30–45 min", emoji: "🚗",
+    title: "Deslocação para Belém",
+    sub: "Monsanto → Doca do Bom Sucesso",
+    status: "adefinir",
+    local: "Partida: Parque de Merendas. Chegada: Doca do Bom Sucesso, Belém.",
+    logistica: "Confirmar meio de transporte: carros próprios em caravana? Transfer organizado? Estacionamento em Belém a confirmar.",
+    notas: "Buffer de tempo incluído. Confirmar hora de concentração na marina com o parceiro de vela. Enviar localização ao grupo.",
+    resp: "A definir"
+  },
+  {
+    phase: "tarde", time: "14h00", dur: "~2h–2h30", emoji: "⛵",
+    title: "Iniciação à Vela no Tejo",
+    sub: "Doca do Bom Sucesso · parceiro a confirmar",
+    status: "pendente",
+    local: "Doca do Bom Sucesso, Belém (a confirmar com o parceiro selecionado).",
+    logistica: "Shortlist de fornecedores: Tagus Cruises / RA Boat Tours / Veltagus. Orçamento negociado: ~922,50€ c/IVA. Confirmar briefing de segurança, coletes e número mínimo de participantes.",
+    notas: "Avisar equipa para trazer casaco corta-vento (obrigatório no rio). Verificar previsão meteorológica na véspera. Coordenar hora de chegada com o fornecedor.",
+    resp: "Rafael (negociação e confirmação com parceiro)"
+  },
+  {
+    phase: "encerramento", time: "16h30", dur: "~30 min", emoji: "🌅",
+    title: "Encerramento e célula final",
+    sub: "A bordo ou na marina",
+    status: "adefinir",
+    local: "Na marina / a bordo (conforme logística do parceiro de vela).",
+    logistica: "Círculo final: cada pessoa partilha uma palavra ou momento do dia. Agradecimento simbólico à equipa.",
+    notas: "Reconhecer o esforço e abertura de todos. Mencionar a Mariana Dionísio / Merytu. Manter o tom quente e celebratório — não académico.",
+    resp: "Rafael"
+  },
+  {
+    phase: "encerramento", time: "17h00", dur: "—", emoji: "👋",
+    title: "Fim oficial do programa",
+    sub: "Dispersão livre — Belém",
+    status: "adefinir",
+    local: "Belém (zona da Doca do Bom Sucesso).",
+    logistica: "Participantes regressam por meios próprios.",
+    notas: "Enviar mensagem de follow-up e agradecimento à Mariana Dionísio após o evento. Recolher feedback informal antes de dispersar.",
+    resp: "Rafael"
+  }
+];
+
+const PHASE_NAMES = {
+  manha: "🌤 Manhã",
+  almoco: "🍽 Almoço",
+  transicao: "🔄 Transição",
+  tarde: "⛵ Tarde",
+  encerramento: "🌇 Encerramento"
+};
+
+const BADGE = {
+  confirmado: { label: "✓ Confirmado", cls: "badge-confirmado" },
+  pendente: { label: "⚠ A confirmar", cls: "badge-pendente" },
+  adefinir: { label: "○ A definir", cls: "badge-adefinir" }
+};
+
+function makePlan() {
+  const plan = document.getElementById('plan');
+  let lastPhase = null;
+  BLOCKS.forEach((b, i) => {
+    if (b.phase !== lastPhase) {
+      const lbl = document.createElement('div');
+      lbl.className = 'section-label';
+      lbl.textContent = PHASE_NAMES[b.phase] || b.phase;
+      plan.appendChild(lbl);
+      lastPhase = b.phase;
+    }
+    const bk = BADGE[b.status] || BADGE.adefinir;
+    const el = document.createElement('div');
+    el.className = 'block';
+    el.innerHTML = `
+      <div class="block-header" onclick="toggle(${i})">
+        <div class="phase-tag ph-${b.phase}"></div>
+        <div class="block-main">
+          <div class="time-col">
+            <div class="time-start" id="ts-${i}">${b.time}</div>
+            <div class="time-dur">${b.dur}</div>
+          </div>
+          <div class="content-col">
+            <div class="moment-title">${b.emoji} ${b.title}
+              <span class="badge ${bk.cls}">${bk.label}</span>
+            </div>
+            <div class="moment-sub">${b.sub}</div>
+          </div>
+        </div>
+        <div class="expand-btn" id="arr-${i}">▼</div>
+      </div>
+      <div class="block-detail" id="det-${i}">
+        <div class="detail-grid">
+          <div class="detail-field full">
+            <label>📍 Local</label>
+            <textarea class="editable" rows="2">${b.local}</textarea>
+          </div>
+          <div class="detail-field full">
+            <label>🔧 Logística</label>
+            <textarea class="editable" rows="3">${b.logistica}</textarea>
+          </div>
+          <div class="detail-field full">
+            <label>💬 Notas / Intenção facilitadora</label>
+            <textarea class="editable" rows="3">${b.notas}</textarea>
+          </div>
+          <div class="detail-field">
+            <label>👤 Responsável</label>
+            <textarea class="editable" rows="2">${b.resp}</textarea>
+          </div>
+          <div class="detail-field">
+            <label>⏰ Hora de início</label>
+            <input class="editable" type="text" value="${b.time}" oninput="document.getElementById('ts-${i}').textContent=this.value">
+          </div>
+        </div>
+      </div>`;
+    plan.appendChild(el);
+  });
+}
+
+function toggle(i) {
+  const d = document.getElementById('det-'+i);
+  const a = document.getElementById('arr-'+i);
+  const open = d.classList.toggle('open');
+  a.textContent = open ? '▲' : '▼';
+}
+function expandAll() { BLOCKS.forEach((_,i)=>{ document.getElementById('det-'+i).classList.add('open'); document.getElementById('arr-'+i).textContent='▲'; }); }
+function collapseAll() { BLOCKS.forEach((_,i)=>{ document.getElementById('det-'+i).classList.remove('open'); document.getElementById('arr-'+i).textContent='▼'; }); }
+
+// Checklist
+const LISTS = {
+  "👕 O que trazer (pessoal)": [
+    "Roupa fresca e confortável para a manhã (orientação em Monsanto)",
+    "Garrafa de água pessoal",
+    "Casaco corta-vento (obrigatório para a tarde de vela)",
+    "Calçado confortável para caminhar",
+    "Protetor solar",
+    "Chapéu ou boné"
+  ],
+  "📦 Materiais / Logística (Rafael)": [
+    "Mapas impressos da prova de orientação",
+    "Envelopes com pistas por posto (selados)",
+    "Fichas de registo por equipa",
+    "Carimbos / autocolantes para os postos",
+    "Pratos, copos, guardanapos descartáveis",
+    "Sacos de lixo",
+    "Sacos térmicos para transporte da pizza",
+    "Bebidas frescas (águas, sumos)",
+    "Cereal bars — snack de meio-percurso"
+  ]
+};
+
+const extraItems = [];
+
+function makeChecklist() {
+  const root = document.getElementById('checklist');
+  root.innerHTML = '';
+  const allLists = { ...LISTS };
+  if (extraItems.length) allLists['✏️ Outros'] = extraItems;
+
+  Object.entries(allLists).forEach(([group, items]) => {
+    const div = document.createElement('div');
+    div.className = 'check-group';
+    div.innerHTML = `<h3>${group}</h3>`;
+    items.forEach(text => {
+      const row = document.createElement('div');
+      row.className = 'check-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      const sp = document.createElement('span');
+      sp.textContent = text;
+      cb.addEventListener('change', () => sp.classList.toggle('done', cb.checked));
+      row.appendChild(cb); row.appendChild(sp);
+      div.appendChild(row);
+    });
+    root.appendChild(div);
+  });
+
+  const adder = document.createElement('div');
+  adder.className = 'check-group';
+  adder.innerHTML = '<h3>➕ Adicionar</h3>';
+  const row = document.createElement('div');
+  row.className = 'add-item-row';
+  const inp = document.createElement('input');
+  inp.placeholder = 'Novo item…';
+  const btn = document.createElement('button');
+  btn.textContent = 'Adicionar';
+  btn.onclick = () => {
+    const v = inp.value.trim();
+    if (!v) return;
+    extraItems.push(v);
+    inp.value = '';
+    makeChecklist();
+  };
+  row.appendChild(inp); row.appendChild(btn);
+  adder.appendChild(row);
+  root.appendChild(adder);
+}
+
+makePlan();
+makeChecklist();
+</script>
+</body>
+</html>
